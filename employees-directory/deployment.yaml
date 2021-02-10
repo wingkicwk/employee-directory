@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: thymeleafdemo-employees-crud-security-with-jdbc-authentication
+  name: thymeleafdemo-employees-crud-security-with-jdbc-authentication
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: thymeleafdemo-employees-crud-security-with-jdbc-authentication
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: thymeleafdemo-employees-crud-security-with-jdbc-authentication
+    spec:
+      containers:
+      - image: mnicwk/thymeleafdemo-employees-crud-security-with-jdbc-authentication:1.0.0
+        imagePullPolicy: IfNotPresent
+        name: thymeleafdemo-employees-crud-security-with-jdbc-authentication
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
+
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    cloud.google.com/neg: '{"ingress":true}'
+
+  labels:
+    app: thymeleafdemo-employees-crud-security-with-jdbc-authentication
+  name: thymeleafdemo-employees-crud-security-with-jdbc-authentication
+  namespace: default
+spec:
+  clusterIP: 10.100.7.120
+  externalTrafficPolicy: Cluster
+  ports:
+  - nodePort: 30308
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: thymeleafdemo-employees-crud-security-with-jdbc-authentication
+  sessionAffinity: None
+  type: LoadBalancer
